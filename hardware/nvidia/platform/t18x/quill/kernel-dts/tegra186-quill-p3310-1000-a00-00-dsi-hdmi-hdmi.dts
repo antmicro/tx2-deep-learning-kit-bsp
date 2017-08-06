@@ -1,0 +1,58 @@
+/*
+ * tegra186-quill-p3310-1000-a00-00-dsi-hdmi-hdmi.dts: DTS file for Quill
+ * to enable display on all three heads with dual HDMI: DSI, HDMI and HDMI.
+ *
+ * Copyright (c) 2016-2017, NVIDIA CORPORATION.  All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ */
+
+#include "tegra186-quill-p3310-1000-a00-00-base.dts"
+
+/ {
+	nvidia,dtsfilename = __FILE__;
+
+	host1x {
+		nvdisplay@15220000 {
+			status = "okay";
+			/delete-property/ vdd-dp-pwr-supply;
+			/delete-property/ avdd-dp-pll-supply;
+			/delete-property/ vdd-edp-sec-mode-supply;
+			/delete-property/ vdd-dp-pad-supply;
+			/delete-property/ vdd_hdmi_5v0-supply;
+			avdd_hdmi-supply = <&spmic_ldo7>;
+			avdd_hdmi_pll-supply = <&spmic_sd2>;
+			vdd_hdmi_5v0-supply = <&vdd_hdmi>;
+		};
+
+		sor {
+			status = "okay";
+			dp-display {
+				status = "disabled";
+			};
+			hdmi-display {
+				bootloader-status = "disabled";
+				status = "okay";
+				disp-default-out {
+					nvidia,out-hdcp-policy = <TEGRA_DC_HDCP_POLICY_ALWAYS_OFF>;
+				};
+			};
+		};
+
+		dpaux@155c0000 {
+			status = "okay";
+		};
+	};
+
+	plugin-manager {
+		/delete-node/ fragment-e3320-dp;
+	};
+};
