@@ -111,8 +111,10 @@ static int extract_pixel_format(
 		*format = V4L2_PIX_FMT_XBGGR10P;
 	else if (strncmp(pixel_t, "bayer_xrggb10p", size) == 0)
 		*format = V4L2_PIX_FMT_XRGGB10P;
+	else if (strncmp(pixel_t, "uyvy", size) == 0)
+		*format = V4L2_PIX_FMT_UYVY;
 	else {
-		pr_err("%s: Need to extend format%s\n", __func__, pixel_t);
+		pr_err("%s: Need to extend format %s\n", __func__, pixel_t);
 		return -EINVAL;
 	}
 
