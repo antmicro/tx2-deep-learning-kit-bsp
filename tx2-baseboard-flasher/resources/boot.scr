@@ -1,0 +1,66 @@
+echo "Updating devicetree."
+# load kernel-dtb
+fdt add ${fdt_addr};
+
+# load parameters
+fdt get value eth-mac /chosen nvidia,ether-mac || exit;
+fdt get value bt-mac /chosen nvidia,bluetooth-mac || exit;
+fdt get value wifi-mac /chosen nvidia,wifi-mac || exit;
+
+# load modified devicetree
+mmc rescan;
+load mmc 0 ${fdt_addr_r} boot/${fdt_file} || echo "Missing file boot/"${fdt_file} && exit;
+fdt addr ${fdt_addr_r};
+
+# resize fdt
+fdt resize
+
+# update parameters
+fdt set /chosen nvidia,ether-mac ${eth-mac};
+fdt set /chosen nvidia,bluetooth-mac ${bt-mac};
+fdt set /chosen nvidia,wifi-mac ${wifi-mac};
+
+# turn off i2c devices not present on the board
+fdt set /i2c@3160000/ina3221x@42 status disabled || exit;
+fdt set /i2c@3160000/ina3221x@43 status disabled || exit;
+fdt set /i2c@3160000/gpio@74 status disabled || exit;
+fdt set /i2c@3160000/gpio@77 status disabled || exit;
+
+# detect camera add-on board
+i2c dev 2 && i2c probe 0x70 && setenv camera_addon_present "1"
+
+if test "${camera_addon_present}" = "1"; then
+   echo "Camera add-on is connected."
+else
+   echo "Camera add-on not detected, turning off the mux."
+   fdt set /i2c@3180000/tca9546@70 status disabled
+fi
+
+if test "${enable_sata_instead_of_pcie}" = "1"; then
+   echo "Enabling SATA, disabling PCIe"
+   fdt set /chosen/plugin-manager/odm-data enable-sata-gpio "<1>" || exit; 
+   fdt set /pcie-controller@10003000/pci@1,0 status disabled || exit; 
+   fdt set /pcie-controller@10003000/pci@2,0 status disabled || exit; 
+   fdt set /pcie-controller@10003000/pci@3,0 status disabled || exit; 
+   fdt set /pcie-controller@10003000 status disabled || exit; 
+else
+   echo "Enabling PCIe, disabling SATA"
+   fdt set /pcie-controller@10003000/pci@1,0 status ok || exit; 
+   fdt set /pcie-controller@10003000/pci@2,0 status disabled || exit; 
+   fdt set /pcie-controller@10003000/pci@3,0 status disabled || exit;
+   fdt set /ahci-sata@3507000 status disabled || exit;
+fi
+
+# load kernel
+load mmc 0 ${kernel_addr_r} boot/${kernel_file} || echo "Missing file boot/"${kernel_file} && exit;
+
+# set bootargs
+setenv bootargs "root=/dev/mmcblk0p1 rw rootwait console=ttyS0,115200n8 console=tty0 " \
+                "OS=l4t fbcon=map:0 net.ifnames=0 memtype=0 video=tegrafb no_console_suspend=1 " \
+                "earlycon=uart8250,mmio32,0x03100000 nvdumper_reserved=0x2772e0000 gpt" \
+                "tegraid=18.1.2.0.0 tegra_keep_boot_clocks maxcpus=6 " \
+                "androidboot.serialno=0321917025931 bl_prof_dataptr=0x10000@0x277240000 " \
+                "sdhci_tegra.en_boot_part_access=1"
+
+# try to boot
+booti ${kernel_addr_r} - ${fdt_addr_r}

@@ -1,0 +1,65 @@
+config TEGRA_PROC_POWER_MODEL
+	bool "Tegra process power model support"
+	depends on ARCH_TEGRA
+	help
+	  Used to create a simple processor power model (PPM) by
+	  collating various chip specific data including voltage,
+	  frequency, and number of cores. This driver is used by
+	  various other drivers including EDP.
+
+config TEGRA_CPU_EDP
+	bool "Enforce electrical design limits on CPU rail (CPU EDP)"
+	depends on ARCH_TEGRA
+	depends on CPU_FREQ && THERMAL
+	default n
+	select TEGRA_PROC_POWER_MODEL
+	help
+	  Enforce electrical design limits on CPU power rail. CPU
+	  EDP prevents the CPU from drawing more current than its
+	  voltage regulator can supply. Limit maximum CPU frequency
+	  based on temperature and number of on-line CPUs to keep
+	  CPU rail current within power supply capabilities.
+
+config TEGRA_GPU_EDP
+	bool "GPU EDP management"
+	depends on THERMAL
+	select TEGRA_PROC_POWER_MODEL
+	default n
+	help
+	  Enforce electrical design limits on GPU power rail. GPU
+	  EDP prevents the GPU from drawing more current than its
+	  voltage regulator can supply. Limit maximum GPU frequency
+	  based on temperature to keep GPU rail current within power
+	  supply capabilities.
+
+config TEGRA_DVFS
+	bool
+	depends on ARCH_TEGRA
+	select PM_OPP
+	help
+	  This adds Tegra DVFS support. There could be several power
+	  rails involved and there might be rails dependency based
+	  on different SoCs, this config enable the generic DVFS
+	  library needed by each SoCs DVFS files.
+
+	  If in doubt, say N.
+
+config TEGRA_210_DVFS
+	bool "Tegra210 DVFS support"
+	depends on ARCH_TEGRA_210_SOC
+	select TEGRA_DVFS
+	help
+	  This enable Tegra210 DVFS functionality, it implements SoC
+	  specific initialization code to be invoked by probe function
+	  defined in generic Tegra DVFS driver, so while enabled it
+	  needs the config TEGRA_DVFS to be enabled as well.
+
+config TEGRA_KFUSE
+	bool "Tegra kfuse support"
+	default n
+	depends on ARCH_TEGRA
+	help
+	  Enable Tegra kfuse support. The kfuse block stores downstream and
+	  upstream HDCP keys for use by the HDMI module.
+
+source "drivers/soc/tegra/sysedp/Kconfig"
