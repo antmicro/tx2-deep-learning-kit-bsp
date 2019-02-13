@@ -1,0 +1,10 @@
+menu "SYSEDP Framework"
+
+config TEGRA_SYS_EDP
+	bool "System EDP framework"
+	default n
+	help
+	  SYSEDP-framework implements system peak current management.
+	  It is a strategy that optimizes power performance within
+	  the constraints of the system's power supply.
+endmenu

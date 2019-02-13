@@ -1,0 +1,28 @@
+menu "NVIDIA Tegra thermal drivers"
+depends on ARCH_TEGRA || PLATFORM_TEGRA
+
+config TEGRA_SOCTHERM
+	tristate "Tegra SOCTHERM thermal management"
+	help
+	  Enable this option for integrated thermal management support on NVIDIA
+	  Tegra systems-on-chip. The driver supports four thermal zones
+	  (CPU, GPU, MEM, PLLX). Cooling devices can be bound to the thermal
+	  zones to manage temperatures. This option is also required for the
+	  emergency thermal reset (thermtrip) feature to function.
+
+config TEGRA_AOTAG
+	bool "Tegra Always-On-Thermal-Alert-Generator"
+	help
+	  Support for Tegra Always-On thermal Alert Generator
+
+config TEGRA_TJ_THERMAL
+	bool "Tegra Tj temperature"
+	default y
+	help
+	  Enable this option to read the temperature of hottest spot on Tegra
+	  SoC. The driver can be configured (via device-tree) to account for
+	  multiple thermal zones and the corresponding configurable hotspot
+	  offsets, and, report the maximum temperature from the same, hence,
+	  representing the hottest point on the chip.
+
+endmenu
