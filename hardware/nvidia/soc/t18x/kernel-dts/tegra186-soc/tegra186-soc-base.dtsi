@@ -515,7 +515,7 @@
 		interrupts = <0 166 0x4>;
 		#stream-id-cells = <1>;
 		status = "disabled";
-		charger-detector = <&tegra_usb_cd>;
+		/* charger-detector = <&tegra_usb_cd>; */
 		otg-controller = <&tegra_xotg>;
 	};
 

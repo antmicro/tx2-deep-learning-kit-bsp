@@ -6,6 +6,8 @@ subdir-ccflags-y += -I$(srctree)/../t18x
 subdir-ccflags-y += -I$(srctree)
 subdir-ccflags-y += -I$(srctree)/sound/soc/tegra-virt-alt/
 
+ccflags-y += -I$(src)
+
 # Tegra platform Support
 snd-soc-tegra-alt-pcm-objs := tegra_pcm_alt.o
 CFLAGS_tegra_pcm_alt.o += -Wno-shift-count-overflow

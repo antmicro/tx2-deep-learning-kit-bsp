@@ -72,6 +72,33 @@
 				};
 			};
 		};
+
+		fragment-enable-sata-gpio {
+			odm-data = "enable-sata-gpio";
+			override@0 {
+				target = <&tegra_main_gpio>;
+				_overlay_ {
+					e3325_lane0_mux {
+						status = "okay";
+						output-high;
+					};
+				};
+			};
+		};
+
+		fragment-enable-pcie-gpio {
+			odm-data = "enable-pcie-gpio";
+			override@0 {
+				target = <&tegra_main_gpio>;
+				_overlay_ {
+					e3325_lane0_mux {
+						status = "okay";
+						output-low;
+					};
+				};
+			};
+		};
+
 		fragment-e3325-xusb {
 			enable-override-on-all-matches;
 			ids = "<3310-1000-500";

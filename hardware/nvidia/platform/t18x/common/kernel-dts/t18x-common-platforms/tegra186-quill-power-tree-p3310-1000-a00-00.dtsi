@@ -28,8 +28,52 @@
 			regulator-always-on;
 			regulator-boot-on;
 		};
+		vdd_1v8_fixed: regulator@102 {
+			compatible = "regulator-fixed";
+			reg = <101>;
+			regulator-name = "vdd-1v8-fixed";
+			regulator-min-microvolt = <1800000>;
+			regulator-max-microvolt = <1800000>;
+			regulator-always-on;
+			regulator-boot-on;
+		};
+		vdd_3v3_fixed: regulator@103 {
+			compatible = "regulator-fixed";
+			reg = <101>;
+			regulator-name = "vdd-3v3-fixed";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			regulator-always-on;
+			regulator-boot-on;
+		};
+		vdd_5v_fixed: regulator@104 {
+			compatible = "regulator-fixed";
+			reg = <101>;
+			regulator-name = "vdd-5v-fixed";
+			regulator-min-microvolt = <5000000>;
+			regulator-max-microvolt = <5000000>;
+			regulator-always-on;
+			regulator-boot-on;
+		};
+		ldo7_fixed: regulator@103 {
+			compatible = "regulator-fixed";
+			reg = <101>;
+			regulator-name = "ldo7-fixed";
+			regulator-min-microvolt = <1000000>;
+			regulator-max-microvolt = <1000000>;
+			regulator-always-on;
+			regulator-boot-on;
+		};
+		ldo8_fixed: regulator@106 {
+			compatible = "regulator-fixed";
+			reg = <101>;
+			regulator-name = "ldo8-fixed";
+			regulator-min-microvolt = <1000000>;
+			regulator-max-microvolt = <1000000>;
+			regulator-always-on;
+			regulator-boot-on;
+		};
 	};
-
 
 	ether_qos@2490000 {
 		vddio_sys_enet_bias-supply = <&spmic_sd2>;
@@ -94,24 +138,24 @@
 	};
 
 	xhci@3530000 {
-		avddio_usb-supply = <&spmic_sd3>;
-		avdd_pll_utmip-supply = <&spmic_sd2>;
-		hvdd_usb-supply =  <&spmic_sd2>;
+		avddio_usb-supply = <&vdd_3v3_fixed>;
+		avdd_pll_utmip-supply = <&vdd_1v8_fixed>;
+		hvdd_usb-supply =  <&vdd_1v8_fixed>;
 	};
 
 	xudc@3550000 {
-		avdd-usb-supply = <&spmic_sd3>;
+		avdd-usb-supply = <&vdd_3v3_fixed>;
 	};
 
 	pinctrl@3520000 {
-		vbus-0-supply = <&vdd_usb0_5v>;
-		vbus-1-supply = <&vdd_usb1_5v>;
-		vbus-2-supply = <&vdd_usb2_5v>;
-		vbus-3-supply = <&battery_reg>;
+		vbus-0-supply = <&vdd_5v_fixed>;
+		vbus-1-supply = <&vdd_5v_fixed>;
+		vbus-2-supply = <&vdd_5v_fixed>;
+		vbus-3-supply = <&vdd_5v_fixed>;
 		vddio-hsic-supply = <&battery_reg>;
-		avdd_usb-supply = <&spmic_sd3>;
-		vclamp_usb-supply = <&spmic_sd2>;
-		avdd_pll_erefeut-supply = <&spmic_sd2>;
+		avdd_usb-supply = <&vdd_3v3_fixed>;
+		vclamp_usb-supply = <&vdd_1v8_fixed>;
+		avdd_pll_erefeut-supply = <&vdd_1v8_fixed>;
 	};
 
 	spi@c260000 {
@@ -147,6 +191,13 @@
 		vddio-dmic-hv-supply =  <&vdd_1v8_ap>;
 		vddio-sdmmc2-hv-supply = <&spmic_sd3>;
 		vddio-sdmmc3-hv-supply =  <&spmic_ldo5>;
+	};
+
+	i2c@c240000 {
+		tca9548@70 {
+			vcc-supply = <&vdd_1v8_ap>;
+			vcc-pullup-supply = <&vdd_1v8_ap>;
+		};
 	};
 
 	i2c@c250000 {

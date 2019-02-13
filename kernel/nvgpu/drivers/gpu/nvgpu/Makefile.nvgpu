@@ -6,6 +6,7 @@ ccflags-y += -Idrivers/devfreq
 ccflags-y += -I../nvgpu/include
 ccflags-y += -I../nvgpu/include/uapi
 ccflags-y += -I../nvgpu/drivers/gpu/nvgpu/include
+ccflags-y += -I$(src)
 ccflags-y += -Wno-multichar
 ccflags-y += -Werror
 ccflags-y += -Wno-error=cpp
