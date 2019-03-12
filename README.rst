@@ -22,52 +22,55 @@ Getting resources
 +++++++++++++++++
 
 #. Create a working directory::
-    
-     mkdir ~/tx2_workdir
-     cd ~/tx2_workdir
+
+     export tx2_workdir=~/tx2_workdir
+     mkdir -p $tx2_workdir
+     cd $tx2_workdir
 #. Clone the kernel sources for the TX2 Deep Learning Kit from this repository::
 
-     git clone https://github.com/antmicro/tx2-deep-learning-kit-bsp.git ~/tx2_workdir/
-#. Download the `Linux for Tegra 28.2.1 for TX2 <https://developer.nvidia.com/embedded/dlc/tx2-driver-package-r2821>`_ driver package provided by NVIDIA for Jetson TX2 to ``tx2_workdir``.
+     git clone https://github.com/antmicro/tx2-deep-learning-kit-bsp.git
+#. Download the `Linux for Tegra 28.2.1 for TX2 <https://developer.nvidia.com/embedded/dlc/tx2-driver-package-r2821>`_ driver package provided by NVIDIA for Jetson TX2 to ``tx2_workdir``::
+
+     wget https://developer.nvidia.com/embedded/dlc/tx2-driver-package-r2821 -O Tegra186_Linux_R28.2.1_aarch64.tbz2
 #. Unpack this archive into the working directory::
 
-     sudo tar xpf Tegra186_Linux_R28.2.1_aarch64.tbz2
+     sudo tar xpof Tegra186_Linux_R28.2.1_aarch64.tbz2
 #. Download the `root filesystem <https://developer.nvidia.com/embedded/dlc/sample-root-filesystem-r2821>`_ to ``tx2_workdir``.
 #. Unpack the downloaded root filesystem into the ``Linux_for_Tegra`` directory::
 
-     sudo tar xpf Tegra_Linux_Sample-Root-Filesystem_R28.2.1_aarch64.tbz2 -C ./Linux_for_Tegra/rootfs
+     sudo tar xpof Tegra_Linux_Sample-Root-Filesystem_R28.2.1_aarch64.tbz2 -C Linux_for_Tegra/rootfs
 
 Kernel compilation
 ++++++++++++++++++
 
 #. Download a cross-compiler and extract it to a local toolchain directory::
 
-     wget http://releases.linaro.org/components/toolchain/binaries/5.3-2016.02/aarch64-linux-gnu/gcc-linaro-5.3-2016.02-x86_64_aarch64-linux-gnu.tar.xz -P ~/tx2_workdir/
-     mkdir ./toolchain
-     tar xpf gcc-linaro-5.3-2016.02-x86_64_aarch64-linux-gnu.tar.xz -C ./toolchain
+     cd $tx2_workdir
+     wget http://releases.linaro.org/components/toolchain/binaries/5.3-2016.02/aarch64-linux-gnu/gcc-linaro-5.3-2016.02-x86_64_aarch64-linux-gnu.tar.xz
+     mkdir toolchain
+     tar xpf gcc-linaro-5.3-2016.02-x86_64_aarch64-linux-gnu.tar.xz -C toolchain
 #. Set the build directory and environment variables::
 
-     cd ~/tx2_workdir
      export ARCH=arm64
-     export PATH=${PWD}/toolchain/gcc-linaro-5.3-2016.02-x86_64_aarch64-linux-gnu/bin/:$PATH
+     export PATH=$tx2_workdir/toolchain/gcc-linaro-5.3-2016.02-x86_64_aarch64-linux-gnu/bin/:$PATH
      export CROSS_COMPILE=aarch64-linux-gnu-
 #. Set the compilation settings (``nproc`` is the number of CPU threads you want to compile on)::
 
-     cd tx2-deep-learning-kit-bsp/kernel/kernel-4.4 
+     cd $tx2_workdir/tx2-deep-learning-kit-bsp/kernel/kernel-4.4
      make tegra18_antmicro_defconfig LOCALVERSION="-antmicro"
 #. Compile the kernel and the devicetree (``nproc`` is the number of CPU threads you want to compile on)::
 
-     make -j<nproc> LOCALVERSION="-antmicro"
-     make -j<nproc> modules LOCALVERSION="-antmicro" 
+     export nproc=4
+     make -j$nproc LOCALVERSION="-antmicro"
+     make -j$nproc modules LOCALVERSION="-antmicro"
      cp .config kernel_config
 #. Make the package with modules and Linux headers so they could be installed locally on the Jetson TX2 module in the next steps::
 
-     cd ~/tx2_workdir/tx2-deep-learning-kit-bsp/tx2-baseboard-module-install
+     cd $tx2_workdir/tx2-deep-learning-kit-bsp/tx2-baseboard-module-install
      make all
-     cd ../kernel/kernel-4.4
 #. Replace the original Image and devicetree with compiled ones::
 
-     cd ~/tx2_workdir
+     cd $tx2_workdir
      sudo cp tx2-deep-learning-kit-bsp/kernel/kernel-4.4/arch/arm64/boot/Image Linux_for_Tegra/kernel/
      sudo cp tx2-deep-learning-kit-bsp/kernel/kernel-4.4/arch/arm64/boot/dts/tegra186-quill-p3310-1000-c03-00-base.dtb Linux_for_Tegra/kernel/dtb/tegra186-quill-p3310-1000-c03-00-base.dtb
      cd Linux_for_Tegra
